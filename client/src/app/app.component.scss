@@ -1,0 +1,9 @@
+.page-content {
+    padding: 0px 16px;
+}
+
+@media only screen and (max-width: 1024px) {
+    .page-content {
+        padding-top: 40px;
+    }
+}

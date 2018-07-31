@@ -1,5 +1,20 @@
 <section id="app">
 
-  <div ui-view></div>
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title">SuprNation</span>
+
+      <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" uiSref="app.1d-1">1d-1</a>
+        <a class="mdl-navigation__link" uiSref="app.1d-2">1d-2</a>
+        <a class="mdl-navigation__link" uiSref="app.2d-1">2d-1</a>
+        <a class="mdl-navigation__link" uiSref="app.2d-2">2d-2</a>
+      </nav>
+    </div>
+
+    <main class="mdl-layout__content page-content">
+      <div ui-view></div>
+    </main>
+  </div>
 
 </section>
