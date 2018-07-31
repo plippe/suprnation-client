@@ -12,6 +12,7 @@ import { HttpService } from '../sdk/http.service';
 import { SocketIoModule } from 'ng-socket-io';
 import { HttpModule } from '@angular/http';
 import { SocketService } from '../sdk/socket.service';
+import { PatternService } from '../sdk/pattern.service';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { SocketService } from '../sdk/socket.service';
   ],
   providers   : [
     HttpService,
-    SocketService
+    SocketService,
+    PatternService
   ],
   bootstrap   : [UIView]
 })
