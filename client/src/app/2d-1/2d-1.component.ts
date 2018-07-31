@@ -3,16 +3,25 @@ import { Environment } from '../../environments/environment';
 import { HttpService } from '../../sdk/http.service';
 import { SocketService } from '../../sdk/socket.service';
 import { Observable } from 'rxjs/Observable';
+import { PatternService } from '../../sdk/pattern.service';
+import 'rxjs/add/operator/take';
 
 @Component({
   templateUrl: './2d-1.component.html',
   styleUrls  : ['./2d-1.component.scss']
 })
+
 export class SecondSimpleComponent implements OnInit, OnDestroy {
 
   @Input() session: any;
 
-  constructor(private socketService: SocketService, private httpService: HttpService) {
+  signals: any[] = [];
+  pattern: any[] = undefined;
+
+  minPatternLength: number = 100
+  maxPatternLength: number = 500
+
+  constructor(private socketService: SocketService, private httpService: HttpService, private patternService: PatternService) {
 
   }
 
@@ -20,9 +29,18 @@ export class SecondSimpleComponent implements OnInit, OnDestroy {
     let socketX = this.socketService.createAndSubscribeToNewSocketInstance(this.session.id + '-x');
     let socketY = this.socketService.createAndSubscribeToNewSocketInstance(this.session.id + '-y');
 
-    Observable.zip(socketX, socketY, (x, y) => ({xId: x.id, yId: y.id, x: x.value, y: y.value}));
+    Observable
+      .zip(socketX, socketY, (x, y) => ({x: x.value, y: y.value}))
+      .take(this.maxPatternLength * 2)
+      .forEach(data => {
+        this.signals.push(data);
 
-    // Decode Pattern
+        let patternFound = this.patternService.findPattern(this.signals, this.minPatternLength);
+        if(patternFound !== undefined) {
+          this.pattern = patternFound;
+          this.socketService.disconnect(this.session.id);
+        }
+      });
   }
 
   ngOnDestroy() {
