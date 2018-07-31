@@ -1,19 +1,19 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FirstSimpleComponent } from './1d-1.component';
+import { PatternComponent } from './pattern.component';
 import { UIRouterModule } from '@uirouter/angular';
-import { FIRST_SIMPLE_STATES } from './1d-1.routes';
+import { PATTERN_STATES } from './pattern.routes';
 
 @NgModule({
   declarations: [
-    FirstSimpleComponent
+    PatternComponent
   ],
   imports     : [
     BrowserModule,
     UIRouterModule.forChild({
-      states: FIRST_SIMPLE_STATES
+      states: PATTERN_STATES
     })
   ]
 })
-export class FirstSimpleModule {
+export class PatternModule {
 }
