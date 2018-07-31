@@ -4,6 +4,8 @@ import { HttpService } from '../../sdk/http.service';
 import { Observable } from 'rxjs/Observable';
 import { PatternService } from '../../sdk/pattern.service';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/finally';
+import 'rxjs/add/operator/catch';
 
 @Component({
   templateUrl: './pattern.component.html',
@@ -24,21 +26,36 @@ export class PatternComponent implements OnInit, OnDestroy {
   minPatternLength: number = 2
   maxPatternLength: number = 500
 
+  isLoading: boolean = false;
+  guessed: boolean = undefined;
+
   constructor(private socketService: SocketService, private httpService: HttpService, private patternService: PatternService) {
   }
 
   ngOnInit() {
+    this.isLoading = true;
+    let finish = () => {
+      this.disconnectFn(this.socketService, this.session.id);
+      this.isLoading = false;
+    }
+
     this.connectFn(this.socketService, this.session.id)
       .take(this.maxPatternLength * 2)
-      .forEach(data => {
-        this.signals.push(data);
+      .subscribe(
+        data => {
+          this.signals.push(data);
 
-        let patternFound = this.patternService.findPattern(this.signals, this.minPatternLength);
-        if(patternFound !== undefined) {
-          this.pattern = patternFound;
-          this.socketService.disconnect(this.session.id);
-        }
-      });
+          this.pattern = this.patternService.findPattern(this.signals, this.minPatternLength);
+          if(this.pattern !== undefined) {
+            finish()
+          }
+        },
+        error => {
+          console.log("Something bad happened: " + error);
+          finish()
+        },
+        finish
+      );
   }
 
   ngOnDestroy() {
@@ -46,14 +63,15 @@ export class PatternComponent implements OnInit, OnDestroy {
   }
 
   private guess(pattern) {
+    let self = this;
     this.httpService.post(this.guessUrlFn(this.session.id), {pattern: pattern}).then((response) => {
       if (response) {
-        // SUCCESS
+        self.guessed = true;
       } else {
-        // FAILURE
+        self.guessed = false;
       }
     }, (error) => {
-      // ERROR
+      console.log("Something bad happened: " + error);
     });
   }
 }

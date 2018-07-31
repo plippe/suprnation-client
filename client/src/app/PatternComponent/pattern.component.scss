@@ -1,0 +1,35 @@
+$text-color:#fff;
+$body-color: #3E4EB8;
+$shadow-color: rgba(255, 255, 255, 0.2);
+
+.card-event {
+    &.mdl-card {
+        width: 256px;
+        height: 128px;
+        background: $body-color;
+    }
+
+    .mdl-card__actions {
+        color: $text-color;
+        border-color: $shadow-color;
+        display: flex;
+        box-sizing:border-box;
+        align-items: center;
+
+        .material-icons {
+            padding-right: 10px;
+        }
+        .mdl-button {
+            color: $text-color;
+        }
+    }
+
+    .mdl-card__title {
+        color: $text-color;
+        align-items: flex-start;
+
+        h4 {
+            margin-top: 0;
+        }
+    }
+}
