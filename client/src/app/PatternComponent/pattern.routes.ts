@@ -4,73 +4,6 @@ import { HttpService } from '../../sdk/http.service';
 import { Environment } from '../../environments/environment';
 import { Observable } from 'rxjs/Observable';
 
-export let PATTERN_STATES = [
-  {
-    component: PatternComponent,
-    name     : 'app.1d-1',
-    url      : '1d-1',
-    resolve  : [
-      { token    : 'title', resolveFn: _ => "1d-1" },
-      { token    : 'guessUrlFn', resolveFn: _ => Environment.FIRST_SIMPLE_GUESS },
-      { token    : 'connectFn', resolveFn: _ => connect },
-      { token    : 'disconnectFn', resolveFn: _ => disconnect },
-      {
-        token    : 'session',
-        deps     : [HttpService],
-        resolveFn: (httpService) => httpService.get(Environment.FIRST_SIMPLE_REQUEST())
-      }
-    ]
-  },
-  {
-    component: PatternComponent,
-    name     : 'app.1d-2',
-    url      : '1d-2',
-    resolve  : [
-      { token    : 'title', resolveFn: _ => "1d-2" },
-      { token    : 'guessUrlFn', resolveFn: _ => Environment.FIRST_COMPLEX_GUESS },
-      { token    : 'connectFn', resolveFn: _ => connect },
-      { token    : 'disconnectFn', resolveFn: _ => disconnect },
-      {
-        token    : 'session',
-        deps     : [HttpService],
-        resolveFn: (httpService) => httpService.get(Environment.FIRST_COMPLEX_REQUEST())
-      }
-    ]
-  },
-  {
-    component: PatternComponent,
-    name     : 'app.2d-1',
-    url      : '2d-1',
-    resolve  : [
-      { token    : 'title', resolveFn: _ => "2d-1" },
-      { token    : 'guessUrlFn', resolveFn: _ => Environment.SECOND_SIMPLE_GUESS },
-      { token    : 'connectFn', resolveFn: _ => connect2d },
-      { token    : 'disconnectFn', resolveFn: _ => disconnect2d },
-      {
-        token    : 'session',
-        deps     : [HttpService],
-        resolveFn: (httpService) => httpService.get(Environment.SECOND_SIMPLE_REQUEST())
-      }
-    ]
-  },
-  {
-    component: PatternComponent,
-    name     : 'app.2d-2',
-    url      : '2d-2',
-    resolve  : [
-      { token    : 'title', resolveFn: _ => "2d-2" },
-      { token    : 'guessUrlFn', resolveFn: _ => Environment.SECOND_COMPLEX_GUESS },
-      { token    : 'connectFn', resolveFn: _ => connect2d },
-      { token    : 'disconnectFn', resolveFn: _ => disconnect2d },
-      {
-        token    : 'session',
-        deps     : [HttpService],
-        resolveFn: (httpService) => httpService.get(Environment.SECOND_COMPLEX_REQUEST())
-      }
-    ]
-  }
-];
-
 interface UpdateResponce {
   value: number
 }
@@ -91,7 +24,52 @@ let connect2d = function(socketService: SocketService, sessionId: String): Obser
   return Observable.zip(socketX, socketY, (x: UpdateResponce, y: UpdateResponce) => ({x: x.value, y: y.value}));
 }
 
-let disconnect2d = function(socketService: SocketService, sessionId: String) {
+let disconnect2d = function(socketService: SocketService, sessionId: String): void {
   socketService.disconnect(sessionId + '-x');
   socketService.disconnect(sessionId + '-y');
 }
+
+let resolvers = function(
+    title: String,
+    env: String,
+    connectFn: (SocketService, string) => Observable<any>,
+    disconnectFn: (SocketService, string) => void) {
+  return [
+    { token    : 'title', resolveFn: _ => title },
+    { token    : 'guessUrlFn', resolveFn: _ => Environment[env + "_GUESS"] },
+    { token    : 'connectFn', resolveFn: _ => connectFn },
+    { token    : 'disconnectFn', resolveFn: _ => disconnectFn },
+    {
+      token    : 'session',
+      deps     : [HttpService],
+      resolveFn: (httpService) => httpService.get(Environment[env + "_REQUEST"]())
+    }
+  ]
+}
+
+export let PATTERN_STATES = [
+  {
+    component: PatternComponent,
+    name     : 'app.1d-1',
+    url      : '1d-1',
+    resolve  : resolvers("1d-1", "FIRST_SIMPLE", connect, disconnect)
+  },
+  {
+    component: PatternComponent,
+    name     : 'app.1d-2',
+    url      : '1d-2',
+    resolve  : resolvers("1d-2", "FIRST_COMPLEX", connect, disconnect)
+  },
+  {
+    component: PatternComponent,
+    name     : 'app.2d-1',
+    url      : '2d-1',
+    resolve  : resolvers("2d-1", "SECOND_SIMPLE", connect2d, disconnect2d)
+  },
+  {
+    component: PatternComponent,
+    name     : 'app.2d-2',
+    url      : '2d-2',
+    resolve  : resolvers("2d-2", "SECOND_COMPLEX", connect2d, disconnect2d)
+  }
+];
