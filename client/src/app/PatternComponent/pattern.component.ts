@@ -21,9 +21,10 @@ export class PatternComponent implements OnInit, OnDestroy {
   @Input() session: any;
   @Input() title: string;
 
-  @Input() guessUrlFn: (string) => string;
-  @Input() connectFn: (SocketService, string) => Observable<XY>;
-  @Input() disconnectFn: (SocketService, string) => void;
+  @Input() guessUrlFn: (string: string) => string;
+  @Input() connectFn: (socketService: SocketService, string: string) => Observable<XY>;
+  @Input() disconnectFn: (SocketService: SocketService, string: string) => void;
+  @Input() castPatternFn: (pattern: XY[]) => any;
 
   signals: XY[] = [];
   pattern: XY[] = undefined;
@@ -69,12 +70,12 @@ export class PatternComponent implements OnInit, OnDestroy {
   }
 
   private guess(pattern) {
-    let self = this;
-    this.httpService.post(this.guessUrlFn(this.session.id), {pattern: pattern}).then((response) => {
+    let castedPattern = this.castPatternFn(pattern);
+    this.httpService.post(this.guessUrlFn(this.session.id), {pattern: castedPattern}).then((response) => {
       if (response) {
-        self.guessed = true;
+        this.guessed = true;
       } else {
-        self.guessed = false;
+        this.guessed = false;
       }
     }, (error) => {
       console.log("Something bad happened: " + error);
