@@ -15,7 +15,9 @@
                 <div class="mdl-card__title mdl-card--expand">
                     <h4>
                         <span *ngIf="isLoading">Seaching pattern ...</span>
-                        <span *ngIf="pattern">{{ pattern?.length }} elements in pattern</span>
+                        <span *ngIf="pattern">
+                            {{ pattern?.length }} elements in pattern
+                        </span>
                     </h4>
                 </div>
                 <div *ngIf="pattern" class="mdl-card__actions mdl-card--border">
