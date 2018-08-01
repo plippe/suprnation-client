@@ -35,4 +35,13 @@
         </div>
     </div>
 
+    <div *ngIf="chartDataSets.length > 0" style="display: block;">
+        <canvas baseChart #chart="base-chart" height="100"
+            [datasets]="chartDataSets"
+            [labels]="chartLabels"
+            [chartType]="chartType"
+            [options]="chartOptions"></canvas>
+
+    </div>
+
 </section>
