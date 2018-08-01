@@ -7,6 +7,11 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/catch';
 
+export interface XY {
+  x: number
+  y: number
+}
+
 @Component({
   templateUrl: './pattern.component.html',
   styleUrls  : ['./pattern.component.scss']
@@ -14,14 +19,14 @@ import 'rxjs/add/operator/catch';
 export class PatternComponent implements OnInit, OnDestroy {
 
   @Input() session: any;
-  @Input() title: any;
+  @Input() title: string;
 
-  @Input() guessUrlFn: (String) =>any;
-  @Input() connectFn: (SocketService, String) => Observable<any>;
-  @Input() disconnectFn: (SocketService, String) =>void;
+  @Input() guessUrlFn: (string) => string;
+  @Input() connectFn: (SocketService, string) => Observable<XY>;
+  @Input() disconnectFn: (SocketService, string) => void;
 
-  signals: number[] = [];
-  pattern: number[] = undefined;
+  signals: XY[] = [];
+  pattern: XY[] = undefined;
 
   minPatternLength: number = 2
   maxPatternLength: number = 500

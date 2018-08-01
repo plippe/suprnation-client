@@ -1,4 +1,4 @@
-import { PatternComponent } from './pattern.component';
+import { PatternComponent, XY } from './pattern.component';
 import { SocketService } from '../../sdk/socket.service';
 import { HttpService } from '../../sdk/http.service';
 import { Environment } from '../../environments/environment';
@@ -8,16 +8,16 @@ interface UpdateResponce {
   value: number
 }
 
-let connect = function(socketService: SocketService, sessionId: String): Observable<any> {
+let connect = function(socketService: SocketService, sessionId: String): Observable<XY> {
   return socketService.createAndSubscribeToNewSocketInstance(sessionId)
-    .map((x: UpdateResponce) => x.value)
+    .map((x: UpdateResponce) => ({x: x.value, y: undefined}))
 }
 
 let disconnect = function(socketService: SocketService, sessionId: String) {
   socketService.disconnect(sessionId);
 }
 
-let connect2d = function(socketService: SocketService, sessionId: String): Observable<any> {
+let connect2d = function(socketService: SocketService, sessionId: String): Observable<XY> {
   let socketX = socketService.createAndSubscribeToNewSocketInstance(sessionId + '-x');
   let socketY = socketService.createAndSubscribeToNewSocketInstance(sessionId + '-y');
 
@@ -32,7 +32,7 @@ let disconnect2d = function(socketService: SocketService, sessionId: String): vo
 let resolvers = function(
     title: String,
     env: String,
-    connectFn: (SocketService, string) => Observable<any>,
+    connectFn: (SocketService, string) => Observable<XY>,
     disconnectFn: (SocketService, string) => void) {
   return [
     { token    : 'title', resolveFn: _ => title },
